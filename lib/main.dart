@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main(List<String> args) {
-  runApp(MaterialApp(
-    theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-    home: const GithubClientApp(),
+  runApp(ChangeNotifierProvider(
+    create: (context) => AppState(),
+    child: const GithubClientApp(),
   ));
 }
 
@@ -13,7 +13,13 @@ class GithubClientApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomePage();
+    var appState = context.watch<AppState>();
+
+    return MaterialApp(
+      theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: appState.themeColor)),
+      home: const HomePage(),
+    );
   }
 }
 
@@ -84,13 +90,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: Center(
-          child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const LoginPage()));
-        },
-        child: const Text("login"),
-      )),
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const LoginPage()));
+          },
+          child: const Text("login"),
+        ),
+      ),
     );
   }
 }
@@ -166,5 +173,21 @@ class _LoginFormState extends State<LoginForm> {
         )
       ]),
     );
+  }
+}
+
+class AppState extends ChangeNotifier {
+  String? token;
+  Color themeColor = Colors.deepPurple;
+
+  bool get isLogined => token == null;
+  void setToken(String token) {
+    this.token = token;
+    notifyListeners();
+  }
+
+  void setThemeColor(Color themeColor) {
+    this.themeColor = themeColor;
+    notifyListeners();
   }
 }
