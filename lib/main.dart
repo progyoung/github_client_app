@@ -62,9 +62,15 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            const ListTile(
-              leading: Icon(Icons.color_lens),
-              title: Text('Theme'),
+            ListTile(
+              leading: const Icon(Icons.color_lens),
+              title: const Text('Theme'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ThemeSetting()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -189,5 +195,36 @@ class AppState extends ChangeNotifier {
   void setThemeColor(Color themeColor) {
     this.themeColor = themeColor;
     notifyListeners();
+  }
+}
+
+class ThemeSetting extends StatelessWidget {
+  const ThemeSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Theme Setting")),
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Container(
+              color: Colors.deepPurpleAccent,
+              height: 40,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              color: Colors.deepOrangeAccent,
+              height: 40,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
