@@ -211,16 +211,26 @@ class ThemeSetting extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Container(
-              color: Colors.deepPurpleAccent,
-              height: 40,
+            GestureDetector(
+              child: Container(
+                color: Colors.deepPurpleAccent,
+                height: 40,
+              ),
+              onTap: () {
+                appState.setThemeColor(Colors.deepPurpleAccent);
+              },
             ),
             const SizedBox(
               height: 5,
             ),
-            Container(
-              color: Colors.deepOrangeAccent,
-              height: 40,
+            GestureDetector(
+              child: Container(
+                color: Colors.deepOrangeAccent,
+                height: 40,
+              ),
+              onTap: () {
+                appState.setThemeColor(Colors.deepOrangeAccent);
+              },
             ),
           ],
         ),
