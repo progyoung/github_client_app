@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LanguagePage(),
+                    builder: (context) => const LanguageSettingPage(),
                   ),
                 );
               },
@@ -68,7 +68,8 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ThemeSetting()),
+                  MaterialPageRoute(
+                      builder: (context) => const ThemeSettingPage()),
                 );
               },
             ),
@@ -108,8 +109,8 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class LanguagePage extends StatelessWidget {
-  const LanguagePage({super.key});
+class LanguageSettingPage extends StatelessWidget {
+  const LanguageSettingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -198,43 +199,56 @@ class AppState extends ChangeNotifier {
   }
 }
 
-class ThemeSetting extends StatelessWidget {
-  const ThemeSetting({super.key});
+final colors = [
+  Colors.amber,
+  Colors.green,
+  Colors.grey,
+  Colors.blue,
+  Colors.orange
+];
+
+class ThemeSettingPage extends StatelessWidget {
+  const ThemeSettingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<AppState>();
-
     return Scaffold(
       appBar: AppBar(title: const Text("Theme Setting")),
       body: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            GestureDetector(
-              child: Container(
-                color: Colors.deepPurpleAccent,
-                height: 40,
+            for (Color color in colors)
+              Column(
+                children: [
+                  ThemeSettingItem(color: color),
+                  const SizedBox(height: 5)
+                ],
               ),
-              onTap: () {
-                appState.setThemeColor(Colors.deepPurpleAccent);
-              },
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            GestureDetector(
-              child: Container(
-                color: Colors.deepOrangeAccent,
-                height: 40,
-              ),
-              onTap: () {
-                appState.setThemeColor(Colors.deepOrangeAccent);
-              },
-            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class ThemeSettingItem extends StatelessWidget {
+  ThemeSettingItem({super.key, required this.color});
+
+  Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+
+    return GestureDetector(
+      child: Container(
+        color: color,
+        height: 40,
+      ),
+      onTap: () {
+        appState.setThemeColor(color);
+      },
     );
   }
 }
