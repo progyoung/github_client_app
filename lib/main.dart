@@ -197,13 +197,14 @@ class _LoginFormState extends State<LoginForm> {
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 var tokenIsValid = await isValid(tokenController.text);
-                if (tokenIsValid) {
-                  appState.setToken(tokenController.text);
-                }
                 var msg = tokenIsValid ? "Login success!" : "Invalid token!";
                 if (context.mounted) {
                   ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: new Text(msg)));
+                  Navigator.pop(context);
+                }
+                if (tokenIsValid) {
+                  appState.setToken(tokenController.text);
                 }
               }
             },
