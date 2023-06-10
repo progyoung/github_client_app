@@ -34,16 +34,28 @@ class HomePage extends StatelessWidget {
         title: const Text('Github Client App'),
       ),
       drawer: const HomeDraw(),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginPage()));
-          },
-          child: const Text("login"),
-        ),
+      body: HomeBody(),
+    );
+  }
+}
+
+class HomeBody extends StatelessWidget {
+  const HomeBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+    var notLogind = Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginPage()));
+        },
+        child: const Text("login"),
       ),
     );
+    var logined = Placeholder();
+    return appState.isLogined ? logined : notLogind;
   }
 }
 
