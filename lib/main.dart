@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 void main(List<String> args) {
   runApp(ChangeNotifierProvider(
@@ -24,9 +25,7 @@ class GithubClientApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({
-    super.key,
-  });
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,46 +33,69 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Github Client App'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+      drawer: const HomeDraw(),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const LoginPage()));
+          },
+          child: const Text("login"),
+        ),
+      ),
+    );
+  }
+}
+
+class HomeDraw extends StatelessWidget {
+  const HomeDraw({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: const Text(
+              'Settings',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
               ),
-              child: const Text(
-                'Settings',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: const Text('Language'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSettingPage(),
                 ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: const Text('Language'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LanguageSettingPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.color_lens),
-              title: const Text('Theme'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ThemeSettingPage()),
-                );
-              },
-            ),
-            ListTile(
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.color_lens),
+            title: const Text('Theme'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ThemeSettingPage()),
+              );
+            },
+          ),
+          Visibility(
+            visible: appState.isLogined,
+            child: ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () => showDialog<String>(
@@ -86,24 +108,18 @@ class HomePage extends StatelessWidget {
                       child: const Text('Cancel'),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
+                      onPressed: () {
+                        appState.setToken(null);
+                        Navigator.pop(context, 'OK');
+                      },
                       child: const Text('OK'),
                     ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginPage()));
-          },
-          child: const Text("login"),
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -149,9 +165,17 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  final tokenController = TextEditingController();
+
+  @override
+  void dispose() {
+    tokenController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
     return Form(
       key: _formKey,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -165,14 +189,22 @@ class _LoginFormState extends State<LoginForm> {
           decoration:
               const InputDecoration(labelText: "Enter your github token"),
           autofocus: true,
+          controller: tokenController,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Processing data...")));
+                var tokenIsValid = await isValid(tokenController.text);
+                if (tokenIsValid) {
+                  appState.setToken(tokenController.text);
+                }
+                var msg = tokenIsValid ? "Login success!" : "Invalid token!";
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: new Text(msg)));
+                }
               }
             },
             child: const Text("Submit"),
@@ -183,12 +215,22 @@ class _LoginFormState extends State<LoginForm> {
   }
 }
 
+Future<bool> isValid(String token) async {
+  var headers = {
+    "Authorization": "Bearer $token",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  final response = await http
+      .head(Uri.parse("https://api.github.com/user/repos"), headers: headers);
+  return response.statusCode == 200;
+}
+
 class AppState extends ChangeNotifier {
   String? token;
   Color themeColor = Colors.deepPurple;
 
-  bool get isLogined => token == null;
-  void setToken(String token) {
+  bool get isLogined => token != null;
+  void setToken(String? token) {
     this.token = token;
     notifyListeners();
   }
@@ -233,9 +275,9 @@ class ThemeSettingPage extends StatelessWidget {
 }
 
 class ThemeSettingItem extends StatelessWidget {
-  ThemeSettingItem({super.key, required this.color});
+  const ThemeSettingItem({super.key, required this.color});
 
-  Color color;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
