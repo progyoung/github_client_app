@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'app_state.dart';
 
 void main(List<String> args) {
   runApp(ChangeNotifierProvider(
@@ -236,22 +237,6 @@ Future<bool> isValid(String token) async {
   final response = await http
       .head(Uri.parse("https://api.github.com/user/repos"), headers: headers);
   return response.statusCode == 200;
-}
-
-class AppState extends ChangeNotifier {
-  String? token;
-  Color themeColor = Colors.deepPurple;
-
-  bool get isLogined => token != null;
-  void setToken(String? token) {
-    this.token = token;
-    notifyListeners();
-  }
-
-  void setThemeColor(Color themeColor) {
-    this.themeColor = themeColor;
-    notifyListeners();
-  }
 }
 
 final colors = [
