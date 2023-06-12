@@ -15,29 +15,49 @@ class RepoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Row(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        color: Colors.blue[100],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 30.0,
-              backgroundImage: NetworkImage(repo.owner.avatar_url),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20.0,
+                      backgroundImage: NetworkImage(repo.owner.avatar_url),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      repo.name,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                Text(repo.language ?? ""),
+              ],
             ),
-            Text(repo.name),
-            Text(repo.language ?? ""),
+            Text(repo.full_name),
+            Text(
+              repo.description ?? "",
+              textAlign: TextAlign.left,
+            ),
+            Row(
+              children: [
+                const Icon(Icons.star_outline),
+                Text(repo.stargazers_count.toString()),
+                const SizedBox(width: 8.0),
+                const Icon(Icons.adb_rounded),
+                Text(repo.open_issues_count.toString()),
+              ],
+            ),
           ],
         ),
-        Text(repo.full_name ?? ""),
-        Text(repo.description ?? ""),
-        Row(
-          children: [
-            Text("start: "),
-            Text(repo.stargazers_count.toString()),
-            Text("issues: "),
-            Text(repo.open_issues_count.toString()),
-          ],
-        ),
-      ],
+      ),
     );
   }
 }
