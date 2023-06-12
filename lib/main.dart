@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'app_state.dart';
+import 'widget/repo_list.dart';
 
 void main(List<String> args) {
   runApp(ChangeNotifierProvider(
@@ -46,7 +47,7 @@ class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
-    var notLogind = Center(
+    var notLogindShow = Center(
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(context,
@@ -55,8 +56,8 @@ class HomeBody extends StatelessWidget {
         child: const Text("login"),
       ),
     );
-    var logined = Placeholder();
-    return appState.isLogined ? logined : notLogind;
+    var loginedShow = RepoList();
+    return appState.isLogined ? loginedShow : notLogindShow;
   }
 }
 

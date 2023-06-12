@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import '../model/repo.dart';
 import '../app_state.dart';
 
@@ -22,17 +24,17 @@ class RepoItem extends StatelessWidget {
               backgroundImage: NetworkImage(repo.owner.avatar_url),
             ),
             Text(repo.name),
-            Text(repo.language),
+            Text(repo.language ?? ""),
           ],
         ),
-        Text(repo.full_name),
-        Text(repo.description),
+        Text(repo.full_name ?? ""),
+        Text(repo.description ?? ""),
         Row(
           children: [
             Text("start: "),
-            Text(repo.stargazers_count as String),
+            Text(repo.stargazers_count.toString()),
             Text("issues: "),
-            Text(repo.open_issues_count as String),
+            Text(repo.open_issues_count.toString()),
           ],
         ),
       ],
@@ -48,11 +50,24 @@ class RepoList extends StatefulWidget {
 }
 
 class _RepoListState extends State<RepoList> {
-  late Future<Repo> repos;
+  late Future<List<Repo>> repos;
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return FutureBuilder<List<Repo>>(
+      future: repos,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text("error happens");
+        } else if (snapshot.hasData) {
+          return ListView(
+            children: [for (var repo in snapshot.data!) RepoItem(repo: repo)],
+          );
+        } else {
+          return Text("nothing");
+        }
+      },
+    );
   }
 
   @override
@@ -61,22 +76,27 @@ class _RepoListState extends State<RepoList> {
     super.initState();
   }
 
-  Future<Repo> fetchRepos() async {
+  Future<List<Repo>> fetchRepos() async {
+    // FIXME, does this fetch the latest appState?
+    var appState = context.read<AppState>();
+    if (!appState.isLogined) {
+      throw Exception("Please login first");
+    }
     var headers = {
-      "Authorization": "Bearer token",
+      HttpHeaders.authorizationHeader: "Bearer ${appState.token}",
       "X-GitHub-Api-Version": "2022-11-28",
     };
     final response = await http
         .get(Uri.parse("https://api.github.com/user/repos"), headers: headers);
 
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return Repo.fromJson(jsonDecode(response.body));
+      var list = (jsonDecode(response.body) as List)
+          .map((e) => Repo.fromJson(e))
+          .toList();
+      return list;
+      // return Repo.fromJson(jsonDecode(response.body));
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load repos');
     }
   }
 }

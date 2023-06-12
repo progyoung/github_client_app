@@ -13,8 +13,8 @@ class Repo {
   late String full_name;
   late num stargazers_count;
   late num open_issues_count;
-  late String description;
-  late String language;
+  late String? description;
+  late String? language;
 
   factory Repo.fromJson(Map<String, dynamic> json) => _$RepoFromJson(json);
   Map<String, dynamic> toJson() => _$RepoToJson(this);

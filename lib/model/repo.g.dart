@@ -13,8 +13,8 @@ Repo _$RepoFromJson(Map<String, dynamic> json) => Repo()
   ..full_name = json['full_name'] as String
   ..stargazers_count = json['stargazers_count'] as num
   ..open_issues_count = json['open_issues_count'] as num
-  ..description = json['description'] as String
-  ..language = json['language'] as String;
+  ..description = json['description'] as String?
+  ..language = json['language'] as String?;
 
 Map<String, dynamic> _$RepoToJson(Repo instance) => <String, dynamic>{
       'owner': instance.owner,
