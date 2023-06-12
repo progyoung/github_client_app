@@ -58,14 +58,13 @@ class _RepoListState extends State<RepoList> {
       future: repos,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text("error happens");
+          return const Text("error happens");
         } else if (snapshot.hasData) {
           return ListView(
             children: [for (var repo in snapshot.data!) RepoItem(repo: repo)],
           );
-        } else {
-          return Text("nothing");
         }
+        return const CircularProgressIndicator();
       },
     );
   }
@@ -77,7 +76,6 @@ class _RepoListState extends State<RepoList> {
   }
 
   Future<List<Repo>> fetchRepos() async {
-    // FIXME, does this fetch the latest appState?
     var appState = context.read<AppState>();
     if (!appState.isLogined) {
       throw Exception("Please login first");
@@ -94,7 +92,6 @@ class _RepoListState extends State<RepoList> {
           .map((e) => Repo.fromJson(e))
           .toList();
       return list;
-      // return Repo.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load repos');
     }
