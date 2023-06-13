@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:github_client_app/generated/locales.g.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'app_state.dart';
 import 'widget/repo_list.dart';
+import 'package:get/get.dart';
 
 void main(List<String> args) {
   runApp(ChangeNotifierProvider(
@@ -18,10 +20,13 @@ class GithubClientApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
 
-    return MaterialApp(
+    return GetMaterialApp(
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: appState.themeColor)),
       home: const HomePage(),
+      translationsKeys: AppTranslation.translations,
+      locale: const Locale('en', 'US'),
+      fallbackLocale: const Locale('en', 'US'),
     );
   }
 }
@@ -33,7 +38,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Github Client App'),
+        title: Text(LocaleKeys.titles_app_name.tr),
       ),
       drawer: const HomeDraw(),
       body: HomeBody(),
@@ -53,7 +58,7 @@ class HomeBody extends StatelessWidget {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LoginPage()));
         },
-        child: const Text("login"),
+        child: Text(LocaleKeys.buttons_login.tr),
       ),
     );
     var loginedShow = RepoList();
@@ -76,9 +81,9 @@ class HomeDraw extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary,
             ),
-            child: const Text(
-              'Settings',
-              style: TextStyle(
+            child: Text(
+              LocaleKeys.titles_settings.tr,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,
               ),
@@ -86,7 +91,7 @@ class HomeDraw extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.language),
-            title: const Text('Language'),
+            title: Text(LocaleKeys.titles_language_setting.tr),
             onTap: () {
               Navigator.push(
                 context,
@@ -98,7 +103,7 @@ class HomeDraw extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.color_lens),
-            title: const Text('Theme'),
+            title: Text(LocaleKeys.buttons_theme.tr),
             onTap: () {
               Navigator.push(
                 context,
@@ -146,12 +151,24 @@ class LanguageSettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Language Setting"),
+        title: Text(LocaleKeys.titles_language_setting.tr),
       ),
-      body: const Column(
+      body: Column(
         children: [
-          Text("English"),
-          Text("简体中文"),
+          ElevatedButton(
+            onPressed: () {
+              var locale = const Locale('zh', 'CN');
+              Get.updateLocale(locale);
+            },
+            child: const Text("简体中文"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              var locale = const Locale('en', 'US');
+              Get.updateLocale(locale);
+            },
+            child: const Text("English"),
+          ),
         ],
       ),
     );
@@ -164,7 +181,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("token setting")),
+      appBar: AppBar(title: Text(LocaleKeys.titles_settings.tr)),
       body: const LoginForm(),
     );
   }
@@ -196,12 +213,12 @@ class _LoginFormState extends State<LoginForm> {
         TextFormField(
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter your github token';
+              return LocaleKeys.labels_token_label.tr;
             }
             return null;
           },
           decoration:
-              const InputDecoration(labelText: "Enter your github token"),
+              InputDecoration(labelText: LocaleKeys.labels_token_label.tr),
           autofocus: true,
           controller: tokenController,
         ),
@@ -225,7 +242,7 @@ class _LoginFormState extends State<LoginForm> {
                 }
               }
             },
-            child: const Text("Submit"),
+            child: Text(LocaleKeys.buttons_submit.tr),
           ),
         )
       ]),

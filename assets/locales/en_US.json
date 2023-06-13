@@ -1,0 +1,17 @@
+{
+    "titles": {
+        "app_name":"Github Client App",
+        "language_setting":"Language Setting",
+        "settings": "Settings",
+        "token_setting":"token setting"
+    },
+    "labels": {
+        "token_label":"Enter your github token"
+    },
+    "buttons":{
+        "submit": "Submit",
+        "login": "Login",
+        "language": "language",
+        "theme":"theme"
+    }
+}

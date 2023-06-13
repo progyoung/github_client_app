@@ -1,0 +1,17 @@
+{
+    "titles": {
+        "app_name": "Github客户端",
+        "language_setting": "语言设置",
+        "settings": "设置",
+        "token_setting": "通行证设置"
+    },
+    "labels": {
+        "token_label": "输入github通行证"
+    },
+    "buttons": {
+        "submit": "提交",
+        "login": "登录",
+        "language": "语言",
+        "theme":"主题"
+    }
+}
